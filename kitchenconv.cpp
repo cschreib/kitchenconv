@@ -9,8 +9,12 @@
 #include <sstream>
 #include <string>
 #include <cctype>
+#include <vector>
+#include <algorithm>
+#include <map>
 
 enum class unit_type {
+    none,
     temperature,
     volume,
     weight
@@ -21,68 +25,109 @@ std::string unit_type_name(unit_type t) {
         case unit_type::temperature : return "temperature";
         case unit_type::volume :      return "volume";
         case unit_type::weight :      return "weight";
+        default :                     return "unknown";
     }
 }
 
 struct unit {
+    unit() = default;
+    unit(double c, unit_type t) : to_si(c), type(t) {}
+
     double to_si = 1;
-    unit_type type;
+    unit_type type = unit_type::none;
+};
+
+inline std::size_t string_distance(const std::string& t, const std::string& u) {
+    if (t.size() > u.size()) {
+        return string_distance(u, t);
+    }
+
+    std::size_t n = t.size();
+    std::size_t d = u.size() - t.size();
+
+    std::size_t best_d = -1;
+    for (std::size_t k = 0; k < d; ++k) {
+        std::size_t td = 0;
+        for (std::size_t i = 0; i < n; ++i) {
+            if (t[i+k] != u[i]) ++td;
+        }
+
+        if (td < best_d) {
+            best_d = td;
+        }
+    }
+
+    return d + best_d;
+}
+
+std::map<std::string, double> density_table = {
+    {"flour",         0.5283},
+    {"butter",        0.9586},
+    {"sugar",         0.8453},
+    {"salt",          1.1548},
+    {"baking-powder", 1.1548},
+    {"baking-soda",   0.9337},
+    {"baking-powder", 0.7208},
+    {"almond-flour",  0.5679},
+    {"tomato-paste",  1.1075},
+    {"tomato-puree",  1.1075},
+    {"tofu",          1.0480},
+    {"oil",           0.9215},
+    {"water",         1.0000},
+    {"parsley",       0.10566},
+    {"basil",         0.10566},
+    {"cilantro",      0.10566},
+    {"dill",          0.10566},
+    {"herbs",         0.10566}
+};
+
+std::map<std::string, unit> unit_table = {
+    {"kg",   unit{1.0,      unit_type::weight}},
+    {"g",    unit{1e-3,     unit_type::weight}},
+    {"mg",   unit{1e-6,     unit_type::weight}},
+    {"lb",   unit{4.536e-1, unit_type::weight}},
+    {"oz",   unit{2.835e-2, unit_type::weight}},
+    {"l",    unit{1.0,      unit_type::volume}},
+    {"dl",   unit{1e-1,     unit_type::volume}},
+    {"cl",   unit{1e-2,     unit_type::volume}},
+    {"ml",   unit{1e-3,     unit_type::volume}},
+    {"gal",  unit{3.785,    unit_type::volume}},
+    {"cup",  unit{2.366e-1, unit_type::volume}},
+    {"floz", unit{2.957e-2, unit_type::volume}},
+    {"tbs",  unit{1.479e-2, unit_type::volume}},
+    {"ts",   unit{4.93e-3,  unit_type::volume}},
+    {"c",    unit{1.0,      unit_type::temperature}}, // 1: celcius
+    {"f",    unit{0.0,      unit_type::temperature}}  // 0: fahrenheit
 };
 
 bool make_unit(unit& u, const std::string& name) {
-    if (name == "kg") {
-        u.to_si = 1;
-        u.type = unit_type::weight;
-    } else if (name == "g") {
-        u.to_si = 1e-3;
-        u.type = unit_type::weight;
-    } else if (name == "mg") {
-        u.to_si = 1e-6;
-        u.type = unit_type::weight;
-    } else if (name == "lb") {
-        u.to_si = 4.536e-1;
-        u.type = unit_type::weight;
-    } else if (name == "oz") {
-        u.to_si = 2.835e-2;
-        u.type = unit_type::weight;
-    } else if (name == "l") {
-        u.to_si = 1;
-        u.type = unit_type::volume;
-    } else if (name == "dl") {
-        u.to_si = 1e-1;
-        u.type = unit_type::volume;
-    } else if (name == "cl") {
-        u.to_si = 1e-2;
-        u.type = unit_type::volume;
-    } else if (name == "ml") {
-        u.to_si = 1e-3;
-        u.type = unit_type::volume;
-    } else if (name == "gal") {
-        u.to_si = 3.785;
-        u.type = unit_type::volume;
-    } else if (name == "cup") {
-        u.to_si = 2.366e-1;
-        u.type = unit_type::volume;
-    } else if (name == "floz") {
-        u.to_si = 2.957e-2;
-        u.type = unit_type::volume;
-    } else if (name == "tbs") {
-        u.to_si = 1.479e-2;
-        u.type = unit_type::volume;
-    } else if (name == "ts") {
-        u.to_si = 4.93e-3;
-        u.type = unit_type::volume;
-    } else if (name == "c") {
-        u.to_si = 1; // 1: celcius
-        u.type = unit_type::temperature;
-    } else if (name == "f") {
-        u.to_si = 0; // 0: fahrenheit
-        u.type = unit_type::temperature;
-    } else {
+    auto iter = unit_table.find(name);
+    if (iter == unit_table.end()) {
         std::cerr << "error: unknown unit '" << name << "'" << std::endl;
+        std::cerr << "note: known units: ";
+        std::vector<std::string> units;
+        units.reserve(unit_table.size());
+        for (auto& v : unit_table) {
+            units.push_back(v.first);
+        }
+
+        std::sort(units.begin(), units.end(),
+            [&](const std::string& s1, const std::string& s2) {
+                return string_distance(name, s1) < string_distance(name, s2);
+            }
+        );
+
+        bool first = true;
+        for (auto& v : units) {
+            if (!first) std::cerr << ", ";
+            std::cerr << v;
+            first = false;
+        }
+        std::cerr << std::endl;
         return false;
     }
 
+    u = iter->second;
     return true;
 }
 
@@ -188,23 +233,34 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        double density_si = 0; // kg/L
-        if (object == "flour") {
-            density_si = 0.5283;
-        } else if (object == "butter") {
-            density_si = 0.9586;
-        } else if (object == "sugar") {
-            density_si = 0.8453;
-        } else if (object == "salt") {
-            density_si = 1.1548;
-        } else if (object == "parsley" || object == "basil" || object == "cilantro" ||
-            object == "dill" || object == "herbs") {
-            density_si = 0.10566;
-        } else {
+        auto iter = density_table.find(object);
+        if (iter == density_table.end()) {
             std::cerr << "error: the density of '" << object << "' is unknown" << std::endl;
+            std::cerr << "note: known densities: ";
+            std::vector<std::string> densities;
+            densities.reserve(density_table.size());
+            for (auto& v : density_table) {
+                densities.push_back(v.first);
+            }
+
+            std::sort(densities.begin(), densities.end(),
+                [&](const std::string& s1, const std::string& s2) {
+                    return string_distance(object, s1) < string_distance(object, s2);
+                }
+            );
+
+            bool first = true;
+            for (auto& v : densities) {
+                if (!first) std::cerr << ", ";
+                std::cerr << v;
+                first = false;
+            }
+            std::cerr << std::endl;
+
             return 1;
         }
 
+        double density_si = iter->second; // kg/L
         if (uf.type == unit_type::volume) {
             uf.type = unit_type::weight;
             uf.to_si *= density_si;
