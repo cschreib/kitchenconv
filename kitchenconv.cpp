@@ -84,22 +84,33 @@ std::map<std::string, double> density_table = {
 };
 
 std::map<std::string, unit> unit_table = {
-    {"kg",   unit{1.0,      unit_type::weight}},
-    {"g",    unit{1e-3,     unit_type::weight}},
-    {"mg",   unit{1e-6,     unit_type::weight}},
-    {"lb",   unit{4.536e-1, unit_type::weight}},
-    {"oz",   unit{2.835e-2, unit_type::weight}},
-    {"l",    unit{1.0,      unit_type::volume}},
-    {"dl",   unit{1e-1,     unit_type::volume}},
-    {"cl",   unit{1e-2,     unit_type::volume}},
-    {"ml",   unit{1e-3,     unit_type::volume}},
-    {"gal",  unit{3.785,    unit_type::volume}},
-    {"cup",  unit{2.366e-1, unit_type::volume}},
-    {"floz", unit{2.957e-2, unit_type::volume}},
-    {"tbs",  unit{1.479e-2, unit_type::volume}},
-    {"ts",   unit{4.93e-3,  unit_type::volume}},
-    {"c",    unit{1.0,      unit_type::temperature}}, // 1: celcius
-    {"f",    unit{0.0,      unit_type::temperature}}  // 0: fahrenheit
+    {"kg",         unit{1.0,      unit_type::weight}},
+    {"g",          unit{1e-3,     unit_type::weight}},
+    {"gram",       unit{1e-3,     unit_type::weight}},
+    {"grams",      unit{1e-3,     unit_type::weight}},
+    {"mg",         unit{1e-6,     unit_type::weight}},
+    {"lb",         unit{4.536e-1, unit_type::weight}},
+    {"oz",         unit{2.835e-2, unit_type::weight}},
+    {"ounce",      unit{2.835e-2, unit_type::weight}},
+    {"ounces",     unit{2.835e-2, unit_type::weight}},
+    {"l",          unit{1.0,      unit_type::volume}},
+    {"liter",      unit{1.0,      unit_type::volume}},
+    {"liters",     unit{1.0,      unit_type::volume}},
+    {"dl",         unit{1e-1,     unit_type::volume}},
+    {"cl",         unit{1e-2,     unit_type::volume}},
+    {"ml",         unit{1e-3,     unit_type::volume}},
+    {"gal",        unit{3.785,    unit_type::volume}},
+    {"galon",      unit{3.785,    unit_type::volume}},
+    {"galons",     unit{3.785,    unit_type::volume}},
+    {"cup",        unit{2.366e-1, unit_type::volume}},
+    {"cups",       unit{2.366e-1, unit_type::volume}},
+    {"floz",       unit{2.957e-2, unit_type::volume}},
+    {"tbs",        unit{1.479e-2, unit_type::volume}},
+    {"ts",         unit{4.93e-3,  unit_type::volume}},
+    {"c",          unit{1.0,      unit_type::temperature}}, // 1: celcius
+    {"celcius",    unit{1.0,      unit_type::temperature}}, // 1: celcius
+    {"f",          unit{0.0,      unit_type::temperature}}, // 0: fahrenheit
+    {"fahrenheit", unit{0.0,      unit_type::temperature}}  // 0: fahrenheit
 };
 
 bool make_unit(unit& u, const std::string& name) {
