@@ -113,6 +113,22 @@ std::map<std::string, unit> unit_table = {
     {"fahrenheit", unit{0.0,      unit_type::temperature}}  // 0: fahrenheit
 };
 
+void sort_and_cerr(std::vector<std::string> values, std::string attempt) {
+    std::sort(values.begin(), values.end(),
+        [&](const std::string& s1, const std::string& s2) {
+            return string_distance(attempt, s1) < string_distance(attempt, s2);
+        }
+    );
+
+    bool first = true;
+    for (auto& v : values) {
+        if (!first) std::cerr << ", ";
+        std::cerr << v;
+        first = false;
+    }
+    std::cerr << std::endl;
+}
+
 bool make_unit(unit& u, const std::string& name) {
     auto iter = unit_table.find(name);
     if (iter == unit_table.end()) {
@@ -124,19 +140,7 @@ bool make_unit(unit& u, const std::string& name) {
             units.push_back(v.first);
         }
 
-        std::sort(units.begin(), units.end(),
-            [&](const std::string& s1, const std::string& s2) {
-                return string_distance(name, s1) < string_distance(name, s2);
-            }
-        );
-
-        bool first = true;
-        for (auto& v : units) {
-            if (!first) std::cerr << ", ";
-            std::cerr << v;
-            first = false;
-        }
-        std::cerr << std::endl;
+        sort_and_cerr(std::move(units), name);
         return false;
     }
 
@@ -256,20 +260,7 @@ int main(int argc, char* argv[]) {
                 densities.push_back(v.first);
             }
 
-            std::sort(densities.begin(), densities.end(),
-                [&](const std::string& s1, const std::string& s2) {
-                    return string_distance(object, s1) < string_distance(object, s2);
-                }
-            );
-
-            bool first = true;
-            for (auto& v : densities) {
-                if (!first) std::cerr << ", ";
-                std::cerr << v;
-                first = false;
-            }
-            std::cerr << std::endl;
-
+            sort_and_cerr(std::move(densities), object);
             return 1;
         }
 
