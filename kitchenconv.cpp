@@ -90,9 +90,12 @@ std::map<std::string, unit> unit_table = {
     {"grams",      unit{1e-3,     unit_type::weight}},
     {"mg",         unit{1e-6,     unit_type::weight}},
     {"lb",         unit{4.536e-1, unit_type::weight}},
+    {"pound",      unit{4.536e-1, unit_type::weight}},
+    {"pounds",     unit{4.536e-1, unit_type::weight}},
     {"oz",         unit{2.835e-2, unit_type::weight}},
     {"ounce",      unit{2.835e-2, unit_type::weight}},
     {"ounces",     unit{2.835e-2, unit_type::weight}},
+
     {"l",          unit{1.0,      unit_type::volume}},
     {"liter",      unit{1.0,      unit_type::volume}},
     {"liters",     unit{1.0,      unit_type::volume}},
@@ -107,6 +110,7 @@ std::map<std::string, unit> unit_table = {
     {"floz",       unit{2.957e-2, unit_type::volume}},
     {"tbs",        unit{1.479e-2, unit_type::volume}},
     {"ts",         unit{4.93e-3,  unit_type::volume}},
+
     {"c",          unit{1.0,      unit_type::temperature}}, // 1: celcius
     {"celcius",    unit{1.0,      unit_type::temperature}}, // 1: celcius
     {"f",          unit{0.0,      unit_type::temperature}}, // 0: fahrenheit
